@@ -1,2 +1,18 @@
 <h1>Projects</h1>
 
+
+<form
+  #addProjectForm="ngForm"
+  novalidate
+  (ngSubmit)="clickAddProject$.next(addProjectForm)">
+  <input type="text" name="projectName" [ngModel]="projectName">
+  <div class="card-container">
+    <button class="card card-small" type="submit">
+      <svg class="material-icons" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+      <span>Add Project</span>
+    </button>
+  </div>
+</form>
+
+
+
