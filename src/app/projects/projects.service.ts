@@ -11,29 +11,10 @@ export class ProjectsService {
   }
 
   async addProject(projectName: string) {
-    const cbc_api_endpoint = '/v3/projects';
-    const cbc_api_method = 'POST';
-    const cbc_secret_key = 'cbc_secret_key';
-    const cbc_access_key = 'cbc_access_key';
-
-    // Epoch time in milliseconds
-    const cbc_api_now = new Date().getTime().toString();
-
-    // Form the message string from the Hmac hash
-    const cbc_api_message = cbc_api_method + '\n' + cbc_api_endpoint +
-      '\n' + cbc_api_now.toString();
-
-    const cbc_api_signature = await this.hmacSha256Hex(cbc_secret_key, cbc_api_message);
-
-    const headers = new HttpHeaders()
-        .set('content-type', 'application/json')
-        .set('Access-Control-Allow-Origin', '*')
-        .set('Authorization', 'Bearer ' + cbc_access_key + ':' + cbc_api_signature)
-        .set('Couchbase-Timestamp', cbc_api_now)
-
-    this.httpClient.post('https://cloudapi.cloud.couchbase.com/v2/projects',
-        {name: projectName},
-        {headers: headers});
+    return this.httpClient.post('api/v2/projects',
+        {name: projectName}).subscribe(
+        (success) => { debugger},
+        (error) => { debugger});
   }
 
   async hmacSha256Hex(secret: string, message: string): Promise<string> {
