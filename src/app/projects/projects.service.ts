@@ -11,27 +11,34 @@ export class ProjectsService {
     this.httpClient = httpClient;
   }
 
-
-  createToken(clientKey: string, msg: string) {
-    const key = new Buffer(clientKey, 'hex');
-    return crypto.createHmac('sha256', key).update(msg).digest('hex');
-  }
-
   addProject(projectName: string) {
-    const time = new Date().getTime().toString();
-    const token = 'ACCESS_KEY:' +
-        this.createToken('SECRET_KEY', 'POST\n/v2/projects\n' + time);
-    const headers= new HttpHeaders()
+    const cbc_api_endpoint = '/v3/projects';
+    const cbc_api_method = 'POST';
+    const cbc_secret_key = 'cbc_secret_key';
+    const cbc_access_key = 'cbc_access_key';
+
+    // Epoch time in milliseconds
+    const cbc_api_now = new Date().getTime().toString();
+
+    // Form the message string from the Hmac hash
+    const cbc_api_message = cbc_api_method + '\n' + cbc_api_endpoint +
+      '\n' + cbc_api_now.toString();
+
+    // Calculate the hmac hash value with secret key and message
+    const enc = new TextEncoder();
+    const encoded = enc.encode(cbc_api_message);
+
+    const cbc_api_signature = new Crypto().subtle.sign('HMAC', cbc_secret_key, encoded);
+
+    const headers = new HttpHeaders()
         .set('content-type', 'application/json')
         .set('Access-Control-Allow-Origin', '*')
-        .set('Authorization', 'Bearer ' + token)
-        .set('Couchbase-Timestamp', time)
+        .set('Authorization', 'Bearer ' + cbc_access_key + ':' + cbc_api_signature)
+        .set('Couchbase-Timestamp', cbc_api_now)
 
     this.httpClient.post('https://cloudapi.cloud.couchbase.com/v2/projects',
         {name: projectName},
         {headers: headers});
-    // debugger
-
   }
 
   getProjects() {
