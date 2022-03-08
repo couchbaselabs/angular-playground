@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import * as crypto from 'crypto';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +10,7 @@ export class ProjectsService {
     this.httpClient = httpClient;
   }
 
-  addProject(projectName: string) {
+  async addProject(projectName: string) {
     const cbc_api_endpoint = '/v3/projects';
     const cbc_api_method = 'POST';
     const cbc_secret_key = 'cbc_secret_key';
@@ -24,11 +23,7 @@ export class ProjectsService {
     const cbc_api_message = cbc_api_method + '\n' + cbc_api_endpoint +
       '\n' + cbc_api_now.toString();
 
-    // Calculate the hmac hash value with secret key and message
-    const enc = new TextEncoder();
-    const encoded = enc.encode(cbc_api_message);
-
-    const cbc_api_signature = new Crypto().subtle.sign('HMAC', cbc_secret_key, encoded);
+    const cbc_api_signature = await this.hmacSha256Hex(cbc_secret_key, cbc_api_message);
 
     const headers = new HttpHeaders()
         .set('content-type', 'application/json')
@@ -39,6 +34,27 @@ export class ProjectsService {
     this.httpClient.post('https://cloudapi.cloud.couchbase.com/v2/projects',
         {name: projectName},
         {headers: headers});
+  }
+
+  async hmacSha256Hex(secret: string, message: string): Promise<string> {
+    const enc = new TextEncoder();
+    const algorithm = { name: "HMAC", hash: "SHA-256" };
+    const key = await crypto.subtle.importKey(
+      "raw",
+      enc.encode(secret),
+      algorithm,
+      false, ["sign", "verify"]
+    );
+    const hashBuffer = await crypto.subtle.sign(
+      algorithm.name,
+      key,
+      enc.encode(message)
+    );
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(
+      b => b.toString(16).padStart(2, '0')
+    ).join('');
+    return hashHex;
   }
 
   getProjects() {
