@@ -1,18 +1,20 @@
 // this works
 package main
 
-import "fmt"
-import "net/http"
-import "log"
-import "io/ioutil"
-import "bytes"
-import "strconv"
-import "strings"
-import "time"
-import "crypto/hmac"
-import "crypto/sha256"
-import "encoding/base64"
-import "encoding/json"
+import (
+	"fmt"
+	"net/http"
+	"log"
+	"io/ioutil"
+    "bytes"
+    "strconv"
+    "strings"
+    "time"
+    "crypto/hmac"
+    "crypto/sha256"
+    "encoding/base64"
+    "encoding/json"
+)
 
 
 type Response struct {

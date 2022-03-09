@@ -13,8 +13,8 @@ export class ProjectsService {
   async addProject(projectName: string) {
     return this.httpClient.post('api/v2/projects',
         {name: projectName}).subscribe(
-        (success) => { debugger},
-        (error) => { debugger});
+        (success) => {},
+        (error) => {});
   }
 
   async hmacSha256Hex(secret: string, message: string): Promise<string> {
