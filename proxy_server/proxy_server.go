@@ -7,14 +7,10 @@ import (
 	"log"
   "io/ioutil"
   "bytes"
-  "strconv"
-  "strings"
-  "time"
-  "crypto/hmac"
-  "crypto/sha256"
-  "encoding/base64"
-  "encoding/json"
   "os"
+  "encoding/json"
+
+  "github.com/couchbasecloud/rest-api-examples/go/utils"
 )
 
 
@@ -24,7 +20,9 @@ type Response struct {
 type ErrorResponse struct {
     Error string
 }
-
+type ProjectCreatePayload struct {
+	Name string `json:"name"`
+}
 
 func main() {
   // start server
@@ -34,10 +32,7 @@ func main() {
 }
 
 func handler(w http.ResponseWriter, req *http.Request) {
-
-
     log.Printf("Handle Request: %#v\n", req.URL.Path)
-
 
     // we need to buffer the body if we want to read it here and send it
     // in the request.
@@ -55,33 +50,15 @@ func handler(w http.ResponseWriter, req *http.Request) {
 
     proxyReq, err := http.NewRequest(req.Method, url, bytes.NewReader(body))
 
-    // We may want to filter some headers, otherwise we could just use a shallow copy
-    // proxyReq.Header = req.Header
-    proxyReq.Header = make(http.Header)
-    for h, val := range req.Header {
-        proxyReq.Header[h] = val
+    log.Printf("Proxy Request: %#v\n\n\n", proxyReq)
+
+    httpClient := utils.NewClient()
+
+    payload := ProjectCreatePayload{
+      Name: os.Args[1],
     }
 
-    secret := os.Getenv("SECRET_KEY")
-    access := os.Getenv("ACCESS_KEY")
-
-    proxyReq.Header.Add("Content-Type", "application/json");
-    now := strconv.FormatInt(time.Now().Unix(), 10)
-    proxyReq.Header.Add("Couchbase-Timestamp", now)
-    message := strings.Join([]string{"POST", req.URL.Path, now}, "\n")
-    h := hmac.New(sha256.New, []byte(secret))
-    h.Write([]byte(message))
-    bearer := "Bearer " + access + ":" + base64.StdEncoding.EncodeToString(h.Sum(nil))
-    proxyReq.Header.Add("Authorization", bearer)
-
-
-    httpClient := http.Client{}
-
-
-    log.Printf("PROXY REQ: %#v\n", proxyReq)
-    log.Printf("PROXY REQ URL: %s\n", proxyReq.URL)
-
-    resp, err := httpClient.Do(proxyReq)
+    resp, err := httpClient.Do(proxyReq.Method, "/v2/projects", payload)
     if err != nil {
         http.Error(w, err.Error(), http.StatusBadGateway)
         w.WriteHeader(http.StatusInternalServerError)
@@ -98,8 +75,9 @@ func handler(w http.ResponseWriter, req *http.Request) {
         w.Write(r)
     }
 
-    log.Printf("RESPONSE: %#v\n", resp)
-    log.Printf("RESPONSE ERR: %#v\n", err)
+    log.Printf("RESPONSE: %#v\n\n\n", resp)
+    log.Printf("RESPONSE ERR: %#v\n\n\n", err)
 
     defer resp.Body.Close()
 }
+
