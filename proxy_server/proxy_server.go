@@ -5,15 +5,16 @@ import (
 	"fmt"
 	"net/http"
 	"log"
-	"io/ioutil"
-    "bytes"
-    "strconv"
-    "strings"
-    "time"
-    "crypto/hmac"
-    "crypto/sha256"
-    "encoding/base64"
-    "encoding/json"
+  "io/ioutil"
+  "bytes"
+  "strconv"
+  "strings"
+  "time"
+  "crypto/hmac"
+  "crypto/sha256"
+  "encoding/base64"
+  "encoding/json"
+  "os"
 )
 
 
@@ -61,8 +62,8 @@ func handler(w http.ResponseWriter, req *http.Request) {
         proxyReq.Header[h] = val
     }
 
-    secret := "SECRET"
-    access := "ACCESS"
+    secret := os.Getenv("SECRET_KEY")
+    access := os.Getenv("ACCESS_KEY")
 
     proxyReq.Header.Add("Content-Type", "application/json");
     now := strconv.FormatInt(time.Now().Unix(), 10)
