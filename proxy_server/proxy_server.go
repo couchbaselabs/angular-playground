@@ -12,6 +12,15 @@ import "time"
 import "crypto/hmac"
 import "crypto/sha256"
 import "encoding/base64"
+import "encoding/json"
+
+
+type Response struct {
+    Content string
+}
+type ErrorResponse struct {
+    Error string
+}
 
 
 func main() {
@@ -50,8 +59,8 @@ func handler(w http.ResponseWriter, req *http.Request) {
         proxyReq.Header[h] = val
     }
 
-    secret := "SECRET_KEY"
-    access := "ACCESS_KEY"
+    secret := "SECRET"
+    access := "ACCESS"
 
     proxyReq.Header.Add("Content-Type", "application/json");
     now := strconv.FormatInt(time.Now().Unix(), 10)
@@ -72,14 +81,22 @@ func handler(w http.ResponseWriter, req *http.Request) {
     resp, err := httpClient.Do(proxyReq)
     if err != nil {
         http.Error(w, err.Error(), http.StatusBadGateway)
-        return
-    }
+        w.WriteHeader(http.StatusInternalServerError)
+        mErr := ErrorResponse{err.Error()}
+        r, _ := json.Marshal(mErr)
+        w.Write(r)
 
+        return
+    } else {
+        w.WriteHeader(resp.StatusCode)
+        m := Response{"Success!"}
+        r, _ := json.Marshal(m)
+
+        w.Write(r)
+    }
 
     log.Printf("RESPONSE: %#v\n", resp)
     log.Printf("RESPONSE ERR: %#v\n", err)
 
     defer resp.Body.Close()
-
-    // legacy code
 }
