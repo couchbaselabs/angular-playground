@@ -1,18 +1,17 @@
-<h1>Projects</h1>
-
-
 <form
   #addProjectForm="ngForm"
+  class="w-full max-w-sm"
   novalidate
   (ngSubmit)="clickAddProject$.next(addProjectForm)">
-  <input type="text" name="projectName" [ngModel]="projectName">
-  <div class="card-container">
-    <button class="card card-small" type="submit">
-      <svg class="material-icons" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+  <div class="flex items-center border-b border-blue-700 py-2">
+  <input
+       class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none"
+       type="text"
+       name="projectName"
+       placeholder="Project Name"
+       [ngModel]="projectName">
+    <button class="flex-shrink-0 bg-blue-700 hover:bg-blue-500 hover:border-blue-500 border-blue-700 text-sm border-4 text-white py-1 px-2 rounded" type="submit">
       <span>Add Project</span>
     </button>
   </div>
 </form>
-
-
-
