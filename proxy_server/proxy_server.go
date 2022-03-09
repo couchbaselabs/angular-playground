@@ -24,7 +24,8 @@ func main() {
 func handler(w http.ResponseWriter, req *http.Request) {
 
 
-    log.Printf("HERE")
+    log.Printf("Handle Request: %#v\n", req.URL.Path)
+
 
     // we need to buffer the body if we want to read it here and send it
     // in the request.
@@ -38,8 +39,7 @@ func handler(w http.ResponseWriter, req *http.Request) {
     req.Body = ioutil.NopCloser(bytes.NewReader(body))
 
     // create a new url from the raw RequestURI sent by the client
-//     url := fmt.Sprintf("%s://%s%s", proxyScheme, proxyHost, req.RequestURI)
-     url := "https://cloudapi.cloud.couchbase.com/v2/projects"
+    url := "https://cloudapi.cloud.couchbase.com/" + req.URL.Path;
 
     proxyReq, err := http.NewRequest(req.Method, url, bytes.NewReader(body))
 
@@ -56,7 +56,7 @@ func handler(w http.ResponseWriter, req *http.Request) {
     proxyReq.Header.Add("Content-Type", "application/json");
     now := strconv.FormatInt(time.Now().Unix(), 10)
     proxyReq.Header.Add("Couchbase-Timestamp", now)
-    message := strings.Join([]string{"POST", "/v2/projects", now}, "\n")
+    message := strings.Join([]string{"POST", req.URL.Path, now}, "\n")
     h := hmac.New(sha256.New, []byte(secret))
     h.Write([]byte(message))
     bearer := "Bearer " + access + ":" + base64.StdEncoding.EncodeToString(h.Sum(nil))
