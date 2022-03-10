@@ -13,6 +13,7 @@ type Projects = Array<any> | null;
 })
 export class ProjectsComponent implements OnInit, OnDestroy {
   clickAddProject$: Subject<NgForm> = new Subject();
+  clickDeleteProject$: Subject<NgForm> = new Subject();
   destroy$: Subject<boolean> = new Subject<boolean>();
   projects$: BehaviorSubject<Projects> = new BehaviorSubject<Projects>(null);
   projectName: string = '';
@@ -40,6 +41,12 @@ export class ProjectsComponent implements OnInit, OnDestroy {
 
   addProject(addProjectForm: NgForm) {
     this.projectsService.addProject(addProjectForm.value.projectName)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe();
+  }
+
+  deleteProject(projectId: string) {
+    this.projectsService.deleteProject(projectId)
     .pipe(takeUntil(this.destroy$))
     .subscribe();
   }

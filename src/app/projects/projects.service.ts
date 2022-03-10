@@ -10,10 +10,14 @@ export class ProjectsService {
   }
 
   addProject(projectName: string) {
-    return this.httpClient.post('api/v2/projects', { name: projectName });
+    return this.httpClient.post('api/v2/projects', { Name: projectName });
   }
 
   getProjects() {
     return this.httpClient.get('api/v2/projects');
+  }
+
+  deleteProject(projectId: string) {
+    return this.httpClient.delete('api/v2/projects/' + projectId);
   }
 }

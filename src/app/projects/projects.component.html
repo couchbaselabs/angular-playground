@@ -29,7 +29,7 @@
                   Name
                 </th>
                 <th scope="col" class="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400">
-                  Tenant Id
+                  Id
                 </th>
                 <th scope="col" class="relative py-3 px-6">
                   <span class="sr-only">Edit</span>
@@ -45,10 +45,15 @@
                   {{project.name}}
                 </td>
                 <td class="py-4 px-6 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400">
-                  {{project.tenantId}}
+                  {{project.id}}
                 </td>
                 <td class="py-4 px-6 text-sm font-medium text-right whitespace-nowrap">
                   <a href="#" class="text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
+                  <button
+                      type="button"
+                      class="pl-5 text-red-600 dark:text-red-500 hover:underline"
+                      (click)="deleteProject(project.id)">Delete
+                  </button>
                 </td>
               </tr>
             </tbody>

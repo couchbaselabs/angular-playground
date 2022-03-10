@@ -17,7 +17,7 @@ type Response struct {
 type ErrorResponse struct {
     Error string
 }
-type CreatePayload struct {
+type Payload struct {
 	Name string `json:"name"`
 }
 
@@ -39,8 +39,6 @@ func handler(w http.ResponseWriter, req *http.Request) {
         return
     }
 
-    log.Println(string(body))
-
     // you can reassign the body if you need to parse it as multipart
     req.Body = ioutil.NopCloser(bytes.NewReader(body))
 
@@ -53,9 +51,12 @@ func handler(w http.ResponseWriter, req *http.Request) {
 
     httpClient := utils.NewClient()
 
-    resp, err := httpClient.Do(proxyReq.Method, req.URL.Path, nil)
+    if req.Method == "POST" {
+      var payload Payload
+      json.Unmarshal(body, &payload)
+      resp, err := httpClient.Do(proxyReq.Method, req.URL.Path, payload)
 
-    if err != nil {
+      if err != nil {
         http.Error(w, err.Error(), http.StatusBadGateway)
         w.WriteHeader(http.StatusInternalServerError)
         mErr := ErrorResponse{err.Error()}
@@ -63,17 +64,34 @@ func handler(w http.ResponseWriter, req *http.Request) {
         w.Write(r)
 
         return
-    } else {
+      } else {
         w.WriteHeader(resp.StatusCode)
         body, _ := ioutil.ReadAll(resp.Body)
         r, _ := json.Marshal(string(body))
 
         w.Write(r)
+      }
+
+      defer resp.Body.Close()
+    } else {
+      resp, err := httpClient.Do(proxyReq.Method, req.URL.Path, nil)
+      if err != nil {
+        http.Error(w, err.Error(), http.StatusBadGateway)
+        w.WriteHeader(http.StatusInternalServerError)
+        mErr := ErrorResponse{err.Error()}
+        r, _ := json.Marshal(mErr)
+        w.Write(r)
+
+        return
+      } else {
+        w.WriteHeader(resp.StatusCode)
+        body, _ := ioutil.ReadAll(resp.Body)
+        r, _ := json.Marshal(string(body))
+
+        w.Write(r)
+      }
+
+      defer resp.Body.Close()
     }
-
-    log.Printf("RESPONSE: %#v\n\n\n", resp)
-    log.Printf("RESPONSE ERR: %#v\n\n\n", err)
-
-    defer resp.Body.Close()
 }
 
