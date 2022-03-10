@@ -39,6 +39,8 @@ export class ProjectsService {
   }
 
   getProjects() {
-
+    return this.httpClient.get('api/v2/projects').subscribe(
+      (success) => { debugger; let successMsg = JSON.parse(String(success))},
+        (error) => {debugger; let errorMsg = JSON.parse(String(error))});
   }
 }

@@ -28,6 +28,10 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     this.projectsService.addProject(addProjectForm.value.projectName);
   }
 
+  getProjects() {
+    this.projectsService.getProjects();
+  }
+
   ngOnDestroy() {
     this.destroy$.next(true);
     this.destroy$.unsubscribe();

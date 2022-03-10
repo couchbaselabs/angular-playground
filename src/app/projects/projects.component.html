@@ -3,6 +3,14 @@
   class="w-full max-w-sm"
   novalidate
   (ngSubmit)="clickAddProject$.next(addProjectForm)">
+
+  <button
+      type="button"
+      class="flex-shrink-0 bg-blue-700 hover:bg-blue-500 hover:border-blue-500 border-blue-700 text-sm border-4 text-white py-1 px-2 rounded mb-10"
+      (click)="getProjects()">
+    Get Projects
+  </button>
+
   <div class="flex items-center border-b border-blue-700 py-2">
   <input
        class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none"
@@ -10,7 +18,9 @@
        name="projectName"
        placeholder="Project Name"
        [ngModel]="projectName">
-    <button class="flex-shrink-0 bg-blue-700 hover:bg-blue-500 hover:border-blue-500 border-blue-700 text-sm border-4 text-white py-1 px-2 rounded" type="submit">
+    <button
+      class="flex-shrink-0 bg-blue-700 hover:bg-blue-500 hover:border-blue-500 border-blue-700 text-sm border-4 text-white py-1 px-2 rounded"
+      type="submit">
       <span>Add Project</span>
     </button>
   </div>
