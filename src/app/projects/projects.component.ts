@@ -12,15 +12,19 @@ type Projects = Array<any> | null;
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProjectsComponent implements OnInit, OnDestroy {
+  clickAddProject$: Subject<NgForm> = new Subject();
   destroy$: Subject<boolean> = new Subject<boolean>();
   projects$: BehaviorSubject<Projects> = new BehaviorSubject<Projects>(null);
-  clickAddProject$: Subject<NgForm> = new Subject();
   projectName: string = '';
 
   constructor(private projectsService: ProjectsService) {
     this.projectsService = projectsService;
 
-    this.projects$.subscribe(console.log)
+    this.projectsService.getProjects()
+    .pipe(takeUntil(this.destroy$))
+    .subscribe(projects => {
+      this.projects$.next(JSON.parse(projects.toString()).data);
+    });
   }
 
   ngOnInit() {
@@ -32,14 +36,6 @@ export class ProjectsComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.destroy$.next(true);
     this.destroy$.unsubscribe();
-  }
-
-  getProjects() {
-    this.projectsService.getProjects()
-    .pipe(takeUntil(this.destroy$))
-    .subscribe(projects => {
-      this.projects$.next(JSON.parse(projects.toString()).data);
-    });
   }
 
   addProject(addProjectForm: NgForm) {

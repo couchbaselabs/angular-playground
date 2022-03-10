@@ -9,13 +9,15 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { AddProjectComponent } from './add-project/add-project.component';
 import { ProjectsComponent } from './projects/projects.component';
 import { ProjectsService } from './projects/projects.service';
+import { ClustersComponent } from './clusters/clusters.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     DashboardComponent,
     AddProjectComponent,
-    ProjectsComponent
+    ProjectsComponent,
+    ClustersComponent
   ],
   imports: [
     BrowserModule,
