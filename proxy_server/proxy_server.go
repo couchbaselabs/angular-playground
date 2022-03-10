@@ -7,7 +7,6 @@ import (
 	"log"
   "io/ioutil"
   "bytes"
-  "os"
   "encoding/json"
 
   "github.com/couchbasecloud/rest-api-examples/go/utils"
@@ -54,11 +53,7 @@ func handler(w http.ResponseWriter, req *http.Request) {
 
     httpClient := utils.NewClient()
 
-    payload := ProjectCreatePayload{
-      Name: os.Args[1],
-    }
-
-    resp, err := httpClient.Do(proxyReq.Method, "/v2/projects", payload)
+    resp, err := httpClient.Do(proxyReq.Method, "/v2/projects", nil)
     if err != nil {
         http.Error(w, err.Error(), http.StatusBadGateway)
         w.WriteHeader(http.StatusInternalServerError)
