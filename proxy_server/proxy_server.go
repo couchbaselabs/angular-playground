@@ -1,4 +1,3 @@
-// this works
 package main
 
 import (
@@ -12,14 +11,13 @@ import (
   "github.com/couchbasecloud/rest-api-examples/go/utils"
 )
 
-
 type Response struct {
     Content string
 }
 type ErrorResponse struct {
     Error string
 }
-type ProjectCreatePayload struct {
+type CreatePayload struct {
 	Name string `json:"name"`
 }
 
@@ -33,13 +31,15 @@ func main() {
 func handler(w http.ResponseWriter, req *http.Request) {
     log.Printf("Handle Request: %#v\n", req.URL.Path)
 
-    // we need to buffer the body if we want to read it here and send it
-    // in the request.
+    // we need to buffer the body if we want to read
+    // it here and send it in the request.
     body, err := ioutil.ReadAll(req.Body)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
     }
+
+    log.Println(string(body))
 
     // you can reassign the body if you need to parse it as multipart
     req.Body = ioutil.NopCloser(bytes.NewReader(body))
@@ -53,7 +53,8 @@ func handler(w http.ResponseWriter, req *http.Request) {
 
     httpClient := utils.NewClient()
 
-    resp, err := httpClient.Do(proxyReq.Method, "/v2/projects", nil)
+    resp, err := httpClient.Do(proxyReq.Method, req.URL.Path, nil)
+
     if err != nil {
         http.Error(w, err.Error(), http.StatusBadGateway)
         w.WriteHeader(http.StatusInternalServerError)
@@ -64,8 +65,8 @@ func handler(w http.ResponseWriter, req *http.Request) {
         return
     } else {
         w.WriteHeader(resp.StatusCode)
-        m := Response{"Success!"}
-        r, _ := json.Marshal(m)
+        body, _ := ioutil.ReadAll(resp.Body)
+        r, _ := json.Marshal(string(body))
 
         w.Write(r)
     }
