@@ -18,25 +18,25 @@ type ErrorResponse struct {
     Error string
 }
 type Payload struct {
-	Name string `json:"name"`
+    Name string `json:"name"`
 }
 
 func main() {
-  // start server
-  fmt.Println("start server")
-  http.HandleFunc("/", handler)
-  log.Fatal(http.ListenAndServe(":4201", nil))
+    // start server
+    fmt.Println("start server")
+    http.HandleFunc("/", handler)
+    log.Fatal(http.ListenAndServe(":4201", nil))
 }
 
 func handler(w http.ResponseWriter, req *http.Request) {
-    log.Printf("Handle Request: %#v\n", req.URL.Path)
+    // log.Printf("Handle Request: %#v\n", req.URL.Path)
 
     // we need to buffer the body if we want to read
     // it here and send it in the request.
     body, err := ioutil.ReadAll(req.Body)
     if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
+      http.Error(w, err.Error(), http.StatusInternalServerError)
+      return
     }
 
     // you can reassign the body if you need to parse it as multipart
@@ -47,51 +47,40 @@ func handler(w http.ResponseWriter, req *http.Request) {
 
     proxyReq, err := http.NewRequest(req.Method, url, bytes.NewReader(body))
 
-    log.Printf("Proxy Request: %#v\n\n\n", proxyReq)
+    // log.Printf("Proxy Request: %#v\n\n\n", proxyReq)
 
     httpClient := utils.NewClient()
 
-    if req.Method == "POST" {
-      var payload Payload
-      json.Unmarshal(body, &payload)
-      resp, err := httpClient.Do(proxyReq.Method, req.URL.Path, payload)
+    var payload *Payload
 
-      if err != nil {
-        http.Error(w, err.Error(), http.StatusBadGateway)
-        w.WriteHeader(http.StatusInternalServerError)
-        mErr := ErrorResponse{err.Error()}
-        r, _ := json.Marshal(mErr)
-        w.Write(r)
+    json.Unmarshal(body, &payload)
 
-        return
-      } else {
-        w.WriteHeader(resp.StatusCode)
-        body, _ := ioutil.ReadAll(resp.Body)
-        r, _ := json.Marshal(string(body))
+    resp, err := httpClient.Do(proxyReq.Method, req.URL.Path, getPayload(payload))
 
-        w.Write(r)
-      }
+    if err != nil {
+      http.Error(w, err.Error(), http.StatusBadGateway)
+      w.WriteHeader(http.StatusInternalServerError)
+      mErr := ErrorResponse{err.Error()}
+      r, _ := json.Marshal(mErr)
+      w.Write(r)
 
-      defer resp.Body.Close()
+      return
     } else {
-      resp, err := httpClient.Do(proxyReq.Method, req.URL.Path, nil)
-      if err != nil {
-        http.Error(w, err.Error(), http.StatusBadGateway)
-        w.WriteHeader(http.StatusInternalServerError)
-        mErr := ErrorResponse{err.Error()}
-        r, _ := json.Marshal(mErr)
-        w.Write(r)
+      w.WriteHeader(resp.StatusCode)
+      body, _ := ioutil.ReadAll(resp.Body)
+      r, _ := json.Marshal(string(body))
 
-        return
-      } else {
-        w.WriteHeader(resp.StatusCode)
-        body, _ := ioutil.ReadAll(resp.Body)
-        r, _ := json.Marshal(string(body))
-
-        w.Write(r)
-      }
-
-      defer resp.Body.Close()
+      w.Write(r)
     }
+
+    defer resp.Body.Close()
+}
+
+func getPayload(payload *Payload) interface{} {
+  if payload != nil {
+    return payload
+  }
+
+  return nil
 }
 
