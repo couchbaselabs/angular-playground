@@ -21,7 +21,7 @@ export class ProjectsComponent implements OnInit, OnDestroy {
   constructor(private projectsService: ProjectsService) {
     this.projectsService = projectsService;
 
-    this.projectsService.getProjects()
+    this.projectsService.getProjectsPoller()
     .pipe(takeUntil(this.destroy$))
     .subscribe(projects => {
       this.projects$.next(JSON.parse(projects.toString()).data);
@@ -42,12 +42,12 @@ export class ProjectsComponent implements OnInit, OnDestroy {
   addProject(addProjectForm: NgForm) {
     this.projectsService.addProject(addProjectForm.value.projectName)
     .pipe(takeUntil(this.destroy$))
-    .subscribe();
+    .subscribe(() => this.projectsService.updateProject.next(true));
   }
 
   deleteProject(projectId: string) {
     this.projectsService.deleteProject(projectId)
     .pipe(takeUntil(this.destroy$))
-    .subscribe();
+    .subscribe(() => this.projectsService.updateProject.next(true));
   }
 }
