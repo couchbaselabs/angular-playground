@@ -7,7 +7,6 @@ import (
   "io/ioutil"
   "bytes"
   "encoding/json"
-  "reflect"
 
   "github.com/couchbasecloud/rest-api-examples/go/utils"
 )
@@ -56,8 +55,6 @@ func handler(w http.ResponseWriter, req *http.Request) {
 
     json.Unmarshal(body, &payload)
 
-    log.Printf("Payload: %#v\n", &payload)
-
     resp, err := httpClient.Do(proxyReq.Method, req.URL.Path, getPayload(payload))
 
     if err != nil {
@@ -79,12 +76,11 @@ func handler(w http.ResponseWriter, req *http.Request) {
     defer resp.Body.Close()
 }
 
-func getPayload(payload interface{}) interface{} {
-  if reflect.ValueOf(payload).Kind() == reflect.Ptr &&
-  reflect.ValueOf(payload).IsNil() {
-    return nil
+func getPayload(payload *Payload) interface{} {
+  if payload != nil {
+    return payload
   }
 
-  return payload
+  return nil
 }
 
