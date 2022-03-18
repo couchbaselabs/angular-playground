@@ -33,8 +33,8 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     this.projectsService
       .getProjectsPoller()
       .pipe(takeUntil(this.destroy$))
-      .subscribe(projects => {
-        this.projects$.next(JSON.parse(projects.toString()).data);
+      .subscribe((projects:any) => {
+        this.projects$.next(projects.data);
       });
   }
 

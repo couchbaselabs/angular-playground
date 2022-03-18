@@ -15,11 +15,11 @@ export class ProjectsService {
   }
 
   addProject(projectName: string) {
-    return this.httpClient.post('api/v2/projects', { Name: projectName });
+    return this.httpClient.post('https://cloudapi.cloud.couchbase.com/v2/projects', { name: projectName });
   }
 
   getProjects() {
-    return this.httpClient.get('api/v2/projects');
+    return this.httpClient.get('https://cloudapi.cloud.couchbase.com/v2/projects');
   }
 
   getProjectsPoller() {
@@ -29,6 +29,6 @@ export class ProjectsService {
   }
 
   deleteProject(projectId: string) {
-    return this.httpClient.delete('api/v2/projects/' + projectId);
+    return this.httpClient.delete('https://cloudapi.cloud.couchbase.com/v2/projects/' + projectId);
   }
 }

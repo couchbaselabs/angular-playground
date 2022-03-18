@@ -10,14 +10,14 @@ export class ClustersService {
   }
 
   addCluster(clusterName: string) {
-    return this.httpClient.post('api/v3/clusters', { clusterName: clusterName });
+    return this.httpClient.post('https://cloudapi.cloud.couchbase.com/v3/clusters', { clusterName: clusterName });
   }
 
   getClusters() {
-    return this.httpClient.get('api/v3/clusters');
+    return this.httpClient.get('https://cloudapi.cloud.couchbase.com/v3/clusters');
   }
 
   deleteCluster(clusterId: string) {
-    return this.httpClient.delete('api/v3/clusters/' + clusterId);
+    return this.httpClient.delete('https://cloudapi.cloud.couchbase.com/v3/clusters/' + clusterId);
   }
 }

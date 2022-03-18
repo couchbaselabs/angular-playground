@@ -23,8 +23,8 @@ export class ClustersComponent implements OnInit, OnDestroy {
 
     this.clustersService.getClusters()
     .pipe(takeUntil(this.destroy$))
-    .subscribe(clusters => {
-      this.clusters$.next(JSON.parse(clusters.toString()).data.items);
+    .subscribe((clusters:any) => {
+      this.clusters$.next(clusters.data.items);
     });
   }
 
