@@ -1,22 +1,8 @@
-const {app, BrowserWindow} = require('electron')
-const url = require("url");
+const {app, BrowserWindow} = require('electron');
+const {execFile} = require('child_process');
 const path = require("path");
 
-
 let mainWindow
-
-
-// TODO: live reload
-// const env = process.env.NODE_ENV || 'development';
-//
-// If development environment
-// if (env === 'development') {
-//   require('electron-reload')(__dirname, {
-//     electron: path.join(__dirname, 'node_modules', '.bin', 'electron'),
-//     hardResetMethod: 'exit'
-//   });
-// }
-
 
 function createWindow () {
   mainWindow = new BrowserWindow({
@@ -27,25 +13,7 @@ function createWindow () {
     }
   })
 
-  mainWindow.loadURL(
-    url.format({
-      pathname: path.join(__dirname, `/dist/angular-playground/index.html`),
-      protocol: "file:",
-      slashes: true
-    })
-  );
-  mainWindow.webContents.on('did-fail-load', () => {
-    console.log('did-fail-load');
-    mainWindow.loadURL(url.format({
-      pathname: path.join(__dirname, 'dist/angular-playground/index.html'),
-      protocol: 'file:',
-      slashes: true
-    }));
-// REDIRECT TO FIRST WEBPAGE AGAIN
-  });
-
-  // Open the DevTools.
-  mainWindow.webContents.openDevTools()
+  mainWindow.loadFile(path.join(__dirname, 'dist/angular-playground/index.html'));
 
   mainWindow.on('closed', function () {
     mainWindow = null
@@ -61,3 +29,5 @@ app.on('window-all-closed', function () {
 app.on('activate', function () {
   if (mainWindow === null) createWindow()
 })
+
+execFile('./backend/main');

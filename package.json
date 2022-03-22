@@ -5,9 +5,12 @@
   "scripts": {
     "ng": "ng",
     "start": "ng build --configuration development --base-href ./ && electron .",
+    "dev": "ng serve && electron .",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
   },
   "private": true,
   "dependencies": {
@@ -34,6 +37,7 @@
     "autoprefixer": "^10.4.2",
     "crypto-js": "^4.1.1",
     "electron": "^17.1.2",
+    "electron-builder": "^22.14.13",
     "jasmine-core": "~4.0.0",
     "karma": "~6.3.0",
     "karma-chrome-launcher": "~3.1.0",
@@ -43,5 +47,15 @@
     "postcss": "^8.4.8",
     "tailwindcss": "^3.0.23",
     "typescript": "~4.5.2"
+  },
+  "build": {
+    "appId": "your.id",
+    "mac": {
+      "category": "your.app.category.type"
+    },
+    "extraResources": [
+      "backend/*"
+    ],
+    "asar": false
   }
 }
