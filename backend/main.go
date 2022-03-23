@@ -1,28 +1,85 @@
 package main
 
 import (
-    "fmt"
-    "net/http"
+	"fmt"
+	"net/http"
+	"log"
+  "io/ioutil"
+  "bytes"
+  "encoding/json"
+
+  "sample.com/backend/client"
 )
 
-func hello(w http.ResponseWriter, req *http.Request) {
-
-    fmt.Fprintf(w, "hello\n")
+type Response struct {
+    Content string
 }
-
-func headers(w http.ResponseWriter, req *http.Request) {
-
-    for name, headers := range req.Header {
-        for _, h := range headers {
-            fmt.Fprintf(w, "%v: %v\n", name, h)
-        }
-    }
+type ErrorResponse struct {
+    Error string
+}
+type Payload struct {
+    Name string `json:"name"`
 }
 
 func main() {
-
-    http.HandleFunc("/hello", hello)
-    http.HandleFunc("/headers", headers)
-
-    http.ListenAndServe(":8090", nil)
+    fmt.Println("start server")
+    http.HandleFunc("/", handler)
+    log.Fatal(http.ListenAndServe(":4201", nil))
 }
+
+func handler(w http.ResponseWriter, req *http.Request) {
+    // log.Printf("Handle Request: %#v\n", req.URL.Path)
+
+    // we need to buffer the body if we want to read
+    // it here and send it in the request.
+    body, err := ioutil.ReadAll(req.Body)
+    if err != nil {
+      http.Error(w, err.Error(), http.StatusInternalServerError)
+      return
+    }
+
+    // you can reassign the body if you need to parse it as multipart
+    req.Body = ioutil.NopCloser(bytes.NewReader(body))
+
+    // create a new url from the raw RequestURI sent by the client
+    url := "https://cloudapi.cloud.couchbase.com/" + req.URL.Path;
+
+    proxyReq, err := http.NewRequest(req.Method, url, bytes.NewReader(body))
+
+    // log.Printf("Proxy Request: %#v\n\n\n", proxyReq)
+
+    httpClient := client.New()
+
+    var payload *Payload
+
+    json.Unmarshal(body, &payload)
+
+    resp, err := httpClient.Do(proxyReq.Method, req.URL.Path, getPayload(payload))
+
+    if err != nil {
+      http.Error(w, err.Error(), http.StatusBadGateway)
+      w.WriteHeader(http.StatusInternalServerError)
+      mErr := ErrorResponse{err.Error()}
+      r, _ := json.Marshal(mErr)
+      w.Write(r)
+
+      return
+    } else {
+      w.WriteHeader(resp.StatusCode)
+      body, _ := ioutil.ReadAll(resp.Body)
+      r, _ := json.Marshal(string(body))
+
+      w.Write(r)
+    }
+
+    defer resp.Body.Close()
+}
+
+func getPayload(payload *Payload) interface{} {
+  if payload != nil {
+    return payload
+  }
+
+  return nil
+}
+

@@ -19,7 +19,7 @@ export class ProjectsService {
   }
 
   getProjects() {
-    return this.httpClient.get('https://cloudapi.cloud.couchbase.com/v2/projects');
+    return this.httpClient.get('http://localhost:4201/v2/projects');
   }
 
   getProjectsPoller() {
