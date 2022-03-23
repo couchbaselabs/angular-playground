@@ -30,4 +30,6 @@ app.on('activate', function () {
   if (mainWindow === null) createWindow()
 })
 
+// TODO: Investigate how to start external script
+// via IpcMain.
 execFile('./backend/main');
