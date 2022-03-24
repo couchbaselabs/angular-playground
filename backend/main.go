@@ -8,7 +8,7 @@ import (
   "bytes"
   "encoding/json"
 
-  "sample.com/backend/client"
+  "backend/client"
 )
 
 type Response struct {
