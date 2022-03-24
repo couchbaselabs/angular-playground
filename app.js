@@ -1,5 +1,5 @@
 const {app, BrowserWindow} = require('electron');
-const {execFile} = require('child_process');
+const spawn = require('child_process').spawn;
 const path = require("path");
 
 let mainWindow
@@ -32,4 +32,4 @@ app.on('activate', function () {
 
 // TODO: Investigate how to start external script
 // via IpcMain.
-execFile('./backend/main');
+spawn('./backend/main');
