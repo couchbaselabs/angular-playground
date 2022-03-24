@@ -4,18 +4,46 @@ const path = require("path");
 
 let mainWindow;
 
-function createWindow(screen) {
-  const INDEX_PATH = "dist/angular-playground/index.html";
+// Exit if we don't have the required ENVIORNMENT variables.
+if (!process.env.BASE_URL) {
+  console.log("Please set BASE_URL environment variable");
+  process.exit(1)
+}
+if (!process.env.SECRET_KEY) {
+  console.log("Please set SECRET_KEY environment variable");
+  process.exit(1)
+}
+if (!process.env.ACCESS_KEY) {
+  console.log("Please set ACCESS_KEY environment variable");
+  process.exit(1)
+}
 
+// Disable CORS for development mode.
+if (isDev()) {
+  app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors');
+}
+
+function isDev() {
+  return process.env['NODE_ENV'] === "development";
+}
+
+function createWindow() {
   mainWindow = new BrowserWindow({
-    width: screen.width || 1800,
-    height: screen.height || 1600,
+    x: 0,
+    y: 0,
+    width: 1800,
+    height: 1400,
     webPreferences: {
+      webSecurity: !isDev(),
       nodeIntegration: true,
     },
   });
 
-  mainWindow.loadFile(path.join(__dirname, INDEX_PATH));
+  if (isDev()) {
+    mainWindow.loadURL("http://localhost:4200");
+  } else {
+    mainWindow.loadFile("dist/angular-playground/index.html");
+  }
 
   mainWindow.on("closed", () => {
     mainWindow = null;
@@ -23,17 +51,13 @@ function createWindow(screen) {
 }
 
 function spawnServer() {
-  let { env, resourcesPath } = process;
-  let directory = env.NODE_ENV === "development" ? __dirname : resourcesPath;
+  let directory = isDev() ? __dirname : process.resourcesPath;
 
   spawn(path.join(directory, "backend/main"));
 }
 
 app.on("ready", () => {
-  // Cannot require screen until the app is ready.
-  const { screen } = require("electron");
-
-  createWindow(screen);
+  createWindow();
   spawnServer();
 });
 
