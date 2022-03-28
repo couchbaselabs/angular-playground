@@ -15,7 +15,7 @@ export class ProjectsService {
   }
 
   addProject(projectName: string) {
-    return this.httpClient.post('https://cloudapi.cloud.couchbase.com/v2/projects', { name: projectName });
+    return this.httpClient.post('http://localhost:4201/v2/projects', { name: projectName });
   }
 
   getProjects() {
@@ -29,6 +29,6 @@ export class ProjectsService {
   }
 
   deleteProject(projectId: string) {
-    return this.httpClient.delete('https://cloudapi.cloud.couchbase.com/v2/projects/' + projectId);
+    return this.httpClient.delete('http://localhost:4201/v2/projects/' + projectId);
   }
 }
