@@ -10,7 +10,51 @@ export class ClustersService {
   }
 
   addCluster(clusterName: string) {
-    return this.httpClient.post('http://localhost:4201/v3/clusters', { clusterName: clusterName });
+    debugger
+    return this.httpClient.post('http://localhost:4201/v3/clusters', {
+      "clusterName": clusterName,
+      "environment": "hosted",
+      "servers": [
+        {
+          "compute": "m5.xlarge",
+          "size": 4,
+          "services": [
+            "data",
+          ],
+          "storage": {
+            "size": 50,
+            "IOPS": 3000,
+            "type": "GP3"
+          }
+        },
+        {
+          "compute": "m5.xlarge",
+          "size": 4,
+          "services": [
+            "index"
+          ],
+          "storage": {
+            "size": 50,
+            "IOPS": 3000,
+            "type": "GP3"
+          }
+        }
+      ],
+      "supportPackage": {
+        "timezone": "IST",
+        "type": "DeveloperPro"
+      },
+      "description": "Example description of a G2 cluster",
+      "place": {
+        "singleAZ": true,
+        "hosted": {
+          "provider": "aws",
+          "CIDR": "10.2.0.0/20",
+          "region": "us-west-2"
+        }
+      },
+      "projectId": "5de5f32b-866c-4a90-bafd-8bdaebb842cd"
+    });
   }
 
   getClusters() {
