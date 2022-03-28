@@ -55,7 +55,11 @@ function createWindow() {
     },
   });
 
-  mainWindow.loadURL(LOAD_PATH);
+  if (IS_DEV) {
+    mainWindow.loadURL(LOAD_PATH);
+  } else {
+    mainWindow.loadFile(path.join(__dirname, LOAD_PATH));
+  }
 
   /** Emitted when the window is closed. */
   mainWindow.on('closed', function() {
