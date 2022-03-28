@@ -10,7 +10,6 @@ export class ClustersService {
   }
 
   addCluster(clusterName: string) {
-    debugger
     return this.httpClient.post('http://localhost:4201/v3/clusters', {
       "clusterName": clusterName,
       "environment": "hosted",
