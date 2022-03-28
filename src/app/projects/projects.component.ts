@@ -34,7 +34,7 @@ export class ProjectsComponent implements OnInit, OnDestroy {
       .getProjectsPoller()
       .pipe(takeUntil(this.destroy$))
       .subscribe((projects:any) => {
-        this.projects$.next(projects.data);
+        this.projects$.next(JSON.parse(projects).data);
       });
   }
 
